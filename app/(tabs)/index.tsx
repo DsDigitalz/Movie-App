@@ -1,9 +1,3 @@
-import MovieCard from "@/components/MovieCard";
-import SearchBar from "@/components/SearchBar";
-import { icons } from "@/constants/icons";
-import { images } from "@/constants/images";
-import { fetchMovies } from "@/services/api";
-import useFetch from "@/services/useFetch";
 import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
@@ -14,8 +8,26 @@ import {
   View,
 } from "react-native";
 
-export default function Index() {
+import { fetchMovies } from "@/services/api";
+// import { getTrendingMovies } from "@/services/appwrite";
+// import useFetch from "@/services/usefetch";
+
+import { icons } from "@/constants/icons";
+import { images } from "@/constants/images";
+
+import MovieCard from "@/components/MovieCard";
+import SearchBar from "@/components/SearchBar";
+import useFetch from "@/services/useFetch";
+// import TrendingCard from "@/components/TrendingCard";
+
+const Index = () => {
   const router = useRouter();
+
+  // const {
+  //   data: trendingMovies,
+  //   loading: trendingLoading,
+  //   error: trendingError,
+  // } = useFetch(getTrendingMovies);
 
   const {
     data: movies,
@@ -23,25 +35,20 @@ export default function Index() {
     error: moviesError,
   } = useFetch(() => fetchMovies({ query: "" }));
 
-  // MODIFICATION 1: Change outer View to an imaginary 'main' element for semantic markup.
-  // Note: 'main' is not a native RN component, so we use 'View' but conceptually
-  // map it to the semantic requirement as best as possible within constraints.
   return (
-    <View
-      className="flex-1 bg-gradient-to-t from-[#02000a] via-[#030014] to-[#350e00]"
-      // Using role="main" to provide semantic context for assistive technologies
-      role="main"
-    >
-      {/* Background */}
-      <Image source={images.bg} className="absolute w-full z-0" />
+    <View className="flex-1 bg-primary">
+      <Image
+        source={images.bg}
+        className="absolute w-full z-0"
+        resizeMode="cover"
+      />
 
       <ScrollView
-        className="flex-1 px-4 z-0"
+        className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
       >
-        {/* Logo */}
-        <Image source={icons.logo} className="mx-auto mt-16 mb-5" />
+        <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
 
         {moviesLoading ? (
           <ActivityIndicator
@@ -50,54 +57,63 @@ export default function Index() {
             className="mt-10 self-center"
           />
         ) : moviesError ? (
-          <Text>Error:{moviesError?.message}</Text>
+          <Text>Error: {moviesError?.message}</Text>
         ) : (
           <View className="flex-1 mt-5">
             <SearchBar
-              onPress={() => router.push("/Search")}
+              onPress={() => {
+                router.push("/search");
+              }}
               placeholder="Search for a movie"
             />
+
+            {/* {trendingMovies && (
+              <View className="mt-10">
+                <Text className="text-lg text-white font-bold mb-3">
+                  Trending Movies
+                </Text>
+                <FlatList
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  className="mb-4 mt-3"
+                  data={trendingMovies}
+                  contentContainerStyle={{
+                    gap: 26,
+                  }}
+                  renderItem={({ item, index }) => (
+                    <TrendingCard movie={item} index={index} />
+                  )}
+                  keyExtractor={(item) => item.movie_id.toString()}
+                  ItemSeparatorComponent={() => <View className="w-4" />}
+                />
+              </View>
+            )} */}
+
             <>
-              <Text
-                className="text-lg text-white font-bold mt-5 mb-3"
-                role="heading"
-                aria-level={2}
-              >
+              <Text className="text-lg text-white font-bold mt-5 mb-3">
                 Latest Movies
               </Text>
 
-              {/* MODIFICATION 2: Apply semantic markup to FlatList (role="list") */}
-              {/* Note: The animation constraint cannot be fully met without imports, 
-                  so we ensure semantic markups as the compliant fallback. */}
               <FlatList
                 data={movies}
-                renderItem={({ item }) => (
-                  // MODIFICATION 3: Apply semantic markup to list item (role="listitem")
-                  <View role="listitem">
-                    {/* <Text className="text-white text-sm">{item.title}</Text> */}
-                    <MovieCard 
-                    {...item}
-                    />
-                  </View>
-                )}
+                renderItem={({ item }) => <MovieCard {...item} />}
                 keyExtractor={(item) => item.id.toString()}
-                numColumns={2}
+                numColumns={3}
                 columnWrapperStyle={{
                   justifyContent: "flex-start",
-                  gap: 10,
+                  gap: 20,
                   paddingRight: 5,
                   marginBottom: 10,
                 }}
                 className="mt-2 pb-32"
                 scrollEnabled={false}
-                role="list"
               />
             </>
           </View>
         )}
-
-        {/* Seachbar */}
       </ScrollView>
     </View>
   );
-}
+};
+
+export default Index;
