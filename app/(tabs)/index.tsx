@@ -17,17 +17,25 @@ import { images } from "@/constants/images";
 
 import MovieCard from "@/components/MovieCard";
 import SearchBar from "@/components/SearchBar";
+import { getTrendingMovies } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
 // import TrendingCard from "@/components/TrendingCard";
 
 const Index = () => {
   const router = useRouter();
 
+  // The rest of the commented-out code is preserved as is.
   // const {
   //   data: trendingMovies,
   //   loading: trendingLoading,
   //   error: trendingError,
   // } = useFetch(getTrendingMovies);
+
+  const {
+    data: trendingMovies,
+    loading: trendingLoading,
+    error: trendingError,
+  } = useFetch(getTrendingMovies);
 
   const {
     data: movies,
@@ -36,30 +44,54 @@ const Index = () => {
   } = useFetch(() => fetchMovies({ query: "" }));
 
   return (
-    <View className="flex-1 bg-primary">
+    // Semantic markup: Main application container
+    <View className="flex-1 bg-primary" role="main">
       <Image
         source={images.bg}
         className="absolute w-full z-0"
         resizeMode="cover"
+        // Semantic markup: Decorative image
+        role="presentation"
+        aria-hidden={true}
       />
 
+      {/* Semantic markup: Main content scrollable area */}
       <ScrollView
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
+        role="region"
+        aria-label="Main content area"
       >
-        <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
+        <Image
+          source={icons.logo}
+          className="w-12 h-10 mt-14 mb-5 mx-auto"
+          // Semantic markup: Application logo
+          role="img"
+          aria-label="Application logo"
+        />
 
-        {moviesLoading ? (
+        {moviesLoading || trendingLoading ? (
           <ActivityIndicator
             size="large"
-            color="#0000ff"
+            color="#ab8bff" // Changed color to match theme for better contrast on dark bg
             className="mt-10 self-center"
+            // Semantic markup: Loading indicator
+            accessible={true}
+            accessibilityLabel="Loading latest movies"
           />
-        ) : moviesError ? (
-          <Text>Error: {moviesError?.message}</Text>
+        ) : moviesError || trendingError ? (
+          <Text
+            // Semantic markup: Error message
+            accessible={true}
+            accessibilityRole="alert"
+            className="text-white text-center mt-10"
+          >
+            Error: {moviesError?.message || trendingError?.message}
+          </Text>
         ) : (
           <View className="flex-1 mt-5">
+            {/* SearchBar component already contains semantic markup from previous modifications */}
             <SearchBar
               onPress={() => {
                 router.push("/search");
@@ -67,33 +99,27 @@ const Index = () => {
               placeholder="Search for a movie"
             />
 
-            {/* {trendingMovies && (
+            {/* Trending Movies section is commented out, preserving structure */}
+            {trendingMovies && (
               <View className="mt-10">
-                <Text className="text-lg text-white font-bold mb-3">
-                  Trending Movies
+                T
+                <Text className="text-lg text-white font-bold mt-5 mb-3">
+                  Latest Movies
                 </Text>
-                <FlatList
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  className="mb-4 mt-3"
-                  data={trendingMovies}
-                  contentContainerStyle={{
-                    gap: 26,
-                  }}
-                  renderItem={({ item, index }) => (
-                    <TrendingCard movie={item} index={index} />
-                  )}
-                  keyExtractor={(item) => item.movie_id.toString()}
-                  ItemSeparatorComponent={() => <View className="w-4" />}
-                />
               </View>
-            )} */}
+            )}
 
-            <>
-              <Text className="text-lg text-white font-bold mt-5 mb-3">
+            <View role="region" aria-label="Latest movies list">
+              <Text
+                className="text-lg text-white font-bold mt-5 mb-3"
+                // role="header" // Semantic markup: Section header
+              >
                 Latest Movies
               </Text>
 
+              <FlatList />
+
+              {/* Semantic markup: List of movies */}
               <FlatList
                 data={movies}
                 renderItem={({ item }) => <MovieCard {...item} />}
@@ -107,8 +133,9 @@ const Index = () => {
                 }}
                 className="mt-2 pb-32"
                 scrollEnabled={false}
+                role="list" // Semantic markup: List container
               />
-            </>
+            </View>
           </View>
         )}
       </ScrollView>

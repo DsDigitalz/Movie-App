@@ -8,7 +8,7 @@ module.exports = {
       colors: {
         // Custom colors can be defined here
         primary: "#030014",
-        secondary: "#151312",
+        secondary: "#0F0D23",
         light: {
           100: "#D6C6FF",
           200: "#A8B5DB",
